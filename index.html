@@ -1,5 +1,6 @@
 <title>Crisp's Big Day</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap">
@@ -12,14 +13,16 @@
 }
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font)}
-main{box-sizing:border-box;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
-  padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-#stage{width:min(100%,calc((100dvh - 140px) * 16 / 9));min-width:min(100%,300px);max-width:100%;aspect-ratio:16/9;position:relative;
+main{box-sizing:border-box;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+/* The game takes all the height it can; only a slim key-hint line sits below it on computers. */
+#play{position:relative;width:min(100%,calc((100dvh - 52px) * 16 / 9));min-width:min(100%,300px);max-width:100%;display:flex;flex-direction:column;gap:10px}
+#stage{width:100%;aspect-ratio:16/9;position:relative;
   border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.45);background:#1b1522}
 canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}
 .hint{width:min(100%,960px);display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;color:var(--muted);font-size:14px;line-height:1.6}
 kbd{font-family:var(--font);font-size:12px;background:var(--key);color:var(--ink);border-radius:6px;padding:1px 7px;border-bottom:2px solid #2a2133}
-.touch{display:none;width:min(100%,960px);justify-content:space-between;gap:12px;user-select:none;-webkit-user-select:none}
+.touch{display:none;width:100%;justify-content:space-between;gap:12px;user-select:none;-webkit-user-select:none}
 .touch .grp{display:flex;gap:10px}
 .touch button{font-family:var(--font);font-weight:600;font-size:17px;color:var(--ink);background:var(--panel);border:2px solid #5a4870;border-radius:16px;
   min-width:64px;height:58px;padding:0 14px;touch-action:none}
@@ -27,11 +30,33 @@ kbd{font-family:var(--font);font-size:12px;background:var(--key);color:var(--ink
 .touch button[data-k="jump"]{background:#b86b1f;border-color:var(--accent)}
 .touch button[data-k="cue"]{background:#2f6a8a;border-color:#6cc3ef}
 button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-@media (pointer:coarse){.touch{display:flex}.hint{display:none}}
+@media (pointer:coarse){.touch{display:flex}.hint{display:none}#play{width:min(100%,calc((100dvh - 16px) * 16 / 9))}}
+/* Phone held sideways: the buttons sit on the game's own floor strip, so the screen can fill the height. */
+@media (pointer:coarse) and (orientation:landscape){
+  .touch{position:absolute;left:0;right:0;bottom:0;box-sizing:border-box;padding:0 10px 8px;pointer-events:none}
+  .touch .grp{pointer-events:auto;gap:8px}
+  .touch button{height:44px;min-width:54px;font-size:15px;border-radius:14px;background:rgba(42,33,51,.55);border-color:rgba(255,248,238,.35);backdrop-filter:blur(2px)}
+  .touch button[data-k="jump"]{background:rgba(184,107,31,.7)}
+  .touch button[data-k="cue"]{background:rgba(47,106,138,.7)}
+}
+/* Phone held upright: the screen is short, so the buttons go full-size underneath it. */
+@media (pointer:coarse) and (orientation:portrait){
+  #play{width:100%}
+  .touch{gap:8px}
+  .touch .grp{gap:8px;flex:2}
+  .touch .grp + .grp{flex:3}
+  .touch button{flex:1;min-width:0;padding:0}
+}
 </style>
 
 <main>
+  <div id="play">
   <div id="stage"><canvas id="game" width="960" height="540" tabindex="0" aria-label="Crisp's Big Day: a side-scrolling puppy raising game"></canvas></div>
+  <div class="touch" id="touch">
+    <div class="grp"><button data-k="left" aria-label="Walk left">◀</button><button data-k="right" aria-label="Walk right">▶</button></div>
+    <div class="grp"><button data-k="bark">Bark</button><button data-k="cue">Cue</button><button data-k="jump">Jump</button></div>
+  </div>
+  </div>
   <div class="hint">
     <span><kbd>←</kbd> <kbd>→</kbd> walk</span>
     <span><kbd>Space</kbd> jump</span>
@@ -39,10 +64,6 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
     <span><kbd>X</kbd> bark</span>
     <span><kbd>P</kbd> pause</span>
     <span><kbd>M</kbd> sound</span>
-  </div>
-  <div class="touch" id="touch">
-    <div class="grp"><button data-k="left" aria-label="Walk left">◀</button><button data-k="right" aria-label="Walk right">▶</button></div>
-    <div class="grp"><button data-k="bark">Bark</button><button data-k="cue">Cue</button><button data-k="jump">Jump</button></div>
   </div>
 </main>
 
